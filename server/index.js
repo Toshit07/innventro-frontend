@@ -59,7 +59,7 @@ app.use((req, res, next) => {
   const method = req.method;
   const path = req.path;
   const ip = req.ip;
-  console.log(`${timestamp} - ${method} ${path} - IP: ${ip}`);
+  console.log(`📨 ${timestamp} - ${method} ${path} - IP: ${ip}`);
   next();
 });
 
@@ -84,14 +84,22 @@ mongoose.connection.on('error', (err) => {
   console.error('✗ MongoDB Error:', err);
 });
 
-// API Routes
+// API Routes with logging
+console.log('📍 Mounting API routes...');
 app.use('/api/auth', authRoutes);
+console.log('✓ Auth routes mounted');
 app.use('/api/products', productRoutes);
+console.log('✓ Products routes mounted');
 app.use('/api/users', userRoutes);
+console.log('✓ Users routes mounted');
 app.use('/api/cart', cartRoutes);
+console.log('✓ Cart routes mounted');
 app.use('/api/orders', orderRoutes);
+console.log('✓ Orders routes mounted');
 app.use('/api/payments', paymentRoutes);
+console.log('✓ Payments routes mounted');
 app.use('/api/admin', adminRoutes);
+console.log('✓ Admin routes mounted');
 
 // Health Check
 app.get('/api/health', (req, res) => {
@@ -100,7 +108,20 @@ app.get('/api/health', (req, res) => {
 
 // 404 Handler
 app.use((req, res) => {
-  res.status(404).json({ message: 'Route not found' });
+  console.warn(`⚠️ 404 - Route not found: ${req.method} ${req.path}`);
+  res.status(404).json({ 
+    message: 'Route not found',
+    path: req.path,
+    method: req.method,
+    availableRoutes: [
+      'POST /api/auth/register',
+      'POST /api/auth/login',
+      'POST /api/auth/verify',
+      'POST /api/auth/refresh',
+      'POST /api/auth/logout',
+      'GET /api/health'
+    ]
+  });
 });
 
 // Error Handler

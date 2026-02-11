@@ -38,6 +38,7 @@ const validatePassword = (password) => {
 // Register with enhanced validation
 router.post('/register', async (req, res) => {
   try {
+    console.log('📝 Register request received:', req.body);
     const { name, email, password, confirmPassword } = req.body;
 
     // Input validation
@@ -92,8 +93,8 @@ router.post('/register', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Registration error:', error);
-    res.status(500).json({ message: 'Registration failed' });
+    console.error('❌ Registration error:', error);
+    res.status(500).json({ message: error.message || 'Registration failed' });
   }
 });
 
