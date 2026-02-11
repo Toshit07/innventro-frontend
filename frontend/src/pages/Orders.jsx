@@ -93,7 +93,7 @@ const Orders = ({ direction, user }) => {
                       Order #{order._id.slice(-6).toUpperCase()}
                     </p>
                     <p className="mt-2 font-display text-2xl">
-                      ${order.totalAmount?.toFixed(2)}
+                      ₹{order.totalAmount?.toFixed(2)}
                     </p>
                   </div>
                   <div className="flex flex-wrap items-center gap-3">
@@ -115,7 +115,7 @@ const Orders = ({ direction, user }) => {
                         </p>
                       </div>
                       <span className="text-sm text-gold/80">
-                        ${item.price}
+                        ₹{item.price}
                       </span>
                     </div>
                   ))}

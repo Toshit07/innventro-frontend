@@ -1,5 +1,5 @@
 ﻿import { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import PageTransition from "../components/animations/PageTransition";
 import SectionTitle from "../components/ui/SectionTitle";
@@ -19,6 +19,7 @@ const sizeOptions = [
 
 const Product = ({ direction, perfumes, onAdd }) => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const perfume = perfumes.find((item) => item.id === id) || perfumes[0];
   const [loading, setLoading] = useState(true);
   const [size, setSize] = useState(sizeOptions[0]);
@@ -111,7 +112,10 @@ const Product = ({ direction, perfumes, onAdd }) => {
 
             <div className="grid gap-3 md:grid-cols-2">
               <Button onClick={handleAdd}>Add to Cart</Button>
-              <Button variant="ghost">Buy Now</Button>
+              <Button variant="ghost" onClick={(event) => {
+                handleAdd(event);
+                setTimeout(() => navigate("/checkout"), 500);
+              }}>Buy Now</Button>
             </div>
 
             <AnimatePresence>

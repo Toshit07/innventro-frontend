@@ -28,7 +28,7 @@ const ProductCard = ({ perfume, onAdd }) => (
         src={perfume.images[0]}
         alt={perfume.name}
         className="h-64 w-full object-cover"
-        variants={{ rest: { scale: 1 }, hover: { scale: 1.03 } }}
+        variants={{ rest: { scale: 1 }, hover: { scale: 1 } }}
         transition={{ duration: 0.5, ease: "easeOut" }}
       />
       {perfume.exclusive && (

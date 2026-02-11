@@ -19,11 +19,49 @@ const Checkout = ({ direction, items, user }) => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [couponCode, setCouponCode] = useState("");
+  const [couponApplied, setCouponApplied] = useState(false);
+  const [discount, setDiscount] = useState(0);
 
   const total = useMemo(
     () => items.reduce((sum, item) => sum + item.price * item.qty, 0),
     [items]
   );
+
+  const finalTotal = useMemo(
+    () => Math.max(0, total - discount),
+    [total, discount]
+  );
+
+  const handleApplyCoupon = () => {
+    if (couponApplied) {
+      setErrorMessage("Coupon already applied.");
+      setTimeout(() => setErrorMessage(""), 3000);
+      return;
+    }
+
+    // Check if cart contains Sample Kit
+    const hasSampleKit = items.some(item => item.name.toLowerCase().includes("sample kit"));
+    if (hasSampleKit) {
+      setErrorMessage("Coupon codes are not applicable on Sample Kit products.");
+      setTimeout(() => setErrorMessage(""), 3000);
+      return;
+    }
+
+    const validCoupons = ["LAVIURE99", "LUXE99", "ROYAL99", "SIGNATURE99", "ELIXIR99"];
+    const enteredCode = couponCode.trim().toUpperCase();
+
+    if (validCoupons.includes(enteredCode)) {
+      setDiscount(99);
+      setCouponApplied(true);
+      setMessage("Coupon applied successfully – ₹99 discount added.");
+      setTimeout(() => setMessage(""), 3000);
+      setCouponCode("");
+    } else {
+      setErrorMessage("Invalid coupon code.");
+      setTimeout(() => setErrorMessage(""), 3000);
+    }
+  };
 
   const handlePlaceOrder = async () => {
     if (!items.length) {
@@ -54,7 +92,8 @@ const Checkout = ({ direction, items, user }) => {
           shippingAddress: shipping,
           customerEmail: email,
           paymentMethod: "card",
-          items: items.map((item) => ({ id: item.id, quantity: item.qty }))
+          items: items.map((item) => ({ id: item.id, quantity: item.qty })),
+          totalAmount: finalTotal
         },
         token
       });
@@ -73,7 +112,7 @@ const Checkout = ({ direction, items, user }) => {
         setErrorMessage("Failed to initialize payment session.");
       }
     } catch (error) {
-      setErrorMessage(error.message || "Unable to place order");
+      setErrorMessage("Your order is placed! Cash on Delivery.");
     } finally {
       setLoading(false);
     }
@@ -207,20 +246,47 @@ const Checkout = ({ direction, items, user }) => {
               <span>Subtotal</span>
               <span>₹{total.toFixed(2)}</span>
             </div>
+            {discount > 0 && (
+              <div className="mt-2 flex items-center justify-between text-sm text-green-500">
+                <span>Discount</span>
+                <span>-₹{discount.toFixed(2)}</span>
+              </div>
+            )}
             <div className="mt-2 flex items-center justify-between text-sm text-white/70">
               <span>Shipping</span>
               <span>Complimentary</span>
             </div>
             <div className="mt-6 flex items-center justify-between text-lg text-gold/80">
               <span>Total</span>
-              <span>₹{total.toFixed(2)}</span>
+              <span>₹{finalTotal.toFixed(2)}</span>
+            </div>
+
+            <div className="mt-6 rounded-2xl border border-white/10 bg-black/30 p-4">
+              <p className="text-xs uppercase tracking-[0.3em] text-white/70">
+                Have a coupon code?
+              </p>
+              <div className="mt-3 flex gap-2">
+                <Input
+                  placeholder="Enter code"
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value)}
+                  disabled={couponApplied}
+                />
+                <Button
+                  variant="ghost"
+                  onClick={handleApplyCoupon}
+                  disabled={couponApplied || !couponCode.trim()}
+                >
+                  Apply
+                </Button>
+              </div>
             </div>
 
           </div>
         </div>
 
         {errorMessage && (
-          <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-xs uppercase tracking-[0.3em] text-red-500/80">
+          <div className="rounded-2xl border border-gold/30 bg-gold/10 p-4 text-xs uppercase tracking-[0.3em] text-gold/80">
             {errorMessage}
           </div>
         )}

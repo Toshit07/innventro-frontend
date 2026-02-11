@@ -22,6 +22,11 @@ export const useCursor = () => {
 
     const onOver = (event) => {
       const target = event.target;
+      const isImage = target?.tagName === "IMG";
+      if (isImage) {
+        setCursor((prev) => ({ ...prev, hovering: false }));
+        return;
+      }
       const interactive = target?.closest?.(
         "a, button, input, textarea, select"
       );

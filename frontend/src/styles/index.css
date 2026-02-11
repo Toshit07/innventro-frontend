@@ -111,3 +111,13 @@ body {
     opacity: 0.45;
   }
 }
+
+img {
+  transition: none !important;
+  transform: none !important;
+}
+
+img:hover {
+  transform: none !important;
+  scale: 1 !important;
+}

@@ -54,7 +54,7 @@ const SampleKit = ({
                   id: "sample-kit-" + Date.now(),
                   name: "Sample Kit",
                   brand: "LAVIURE",
-                  price: 150,
+                  price: 99,
                   images: ["/Samplekit.png"],
                   short: `Sample kit with ${count} perfumes: ` + selections.map(p => p.name).join(", "),
                   description: `Sample kit containing ${count} perfumes`,
@@ -67,7 +67,7 @@ const SampleKit = ({
                 onAdd(sampleKit, event);
               }}
             >
-              Add Sample Kit to Cart (₹150)
+              Add Sample Kit to Cart (₹99)
             </Button>
           </div>
         </div>
