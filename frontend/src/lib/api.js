@@ -45,7 +45,8 @@ export const apiRequest = async (path, options = {}) => {
   const response = await fetch(`${API_URL}${path}`, {
     method,
     headers: requestHeaders,
-    body: body ? JSON.stringify(body) : undefined
+    body: body ? JSON.stringify(body) : undefined,
+    credentials: 'include'
   });
 
   const data = await safeJson(response);

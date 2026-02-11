@@ -31,9 +31,8 @@ const validateEmail = (email) => {
 };
 
 const validatePassword = (password) => {
-  // Min 8 chars, at least one uppercase, one lowercase, one number, one special char
-  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-  return passwordRegex.test(password);
+  // Min 6 chars, basic validation
+  return password && password.length >= 6;
 };
 
 // Register with enhanced validation
@@ -51,10 +50,10 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ message: 'Invalid email format' });
     }
 
-    // Password strength validation
+    // Password validation
     if (!validatePassword(password)) {
       return res.status(400).json({
-        message: 'Password must be at least 8 characters with uppercase, lowercase, number, and special character'
+        message: 'Password must be at least 6 characters long'
       });
     }
 
