@@ -1,0 +1,26 @@
+{
+  "name": "innoventure-backend",
+  "version": "1.0.0",
+  "description": "Backend for Innoventure Luxury Perfume Store",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "seed": "node scripts/seedDatabase.js"
+  },
+  "dependencies": {
+    "@auth0/auth0-react": "^2.13.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.0.3",
+    "stripe": "^14.10.0",
+    "validator": "^13.11.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}

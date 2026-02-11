@@ -1,0 +1,113 @@
+﻿@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:opsz,wght@5..96,500,600,700&family=Manrope:wght@300;400;500;600;700&display=swap");
+
+@theme {
+  /* Colors */
+  --color-ink: #0B0B0B;
+  --color-pearl: #F6F6F6;
+  --color-gold: #C8A951;
+
+  /* Fonts */
+  --font-display: "Playfair Display", serif;
+  --font-body: "Manrope", sans-serif;
+
+  /* Box Shadows */
+  --shadow-glow: 0 10px 40px rgba(200, 169, 81, 0.18);
+  --shadow-soft: 0 12px 40px rgba(0, 0, 0, 0.2);
+  --shadow-card: 0 22px 60px rgba(0, 0, 0, 0.28);
+
+  /* Letter Spacing */
+  --letter-spacing-luxe: 0.18em;
+
+  /* Animations */
+  --animate-shimmer: shimmer 2.6s ease-in-out infinite;
+  --animate-slow-pulse: slowPulse 2.8s ease-in-out infinite;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background: #0b0b0b;
+  color: #f6f6f6;
+  min-height: 100vh;
+}
+
+::selection {
+  background: rgba(200, 169, 81, 0.35);
+  color: #f6f6f6;
+}
+
+.lux-divider {
+  border-bottom: 1px solid rgba(246, 246, 246, 0.12);
+}
+
+.lux-blur {
+  background: rgba(11, 11, 11, 0.6);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+}
+
+.lux-ring {
+  box-shadow: 0 0 0 1px rgba(200, 169, 81, 0.25), 0 20px 50px rgba(0, 0, 0, 0.35);
+}
+
+.lux-gradient {
+  background-image: radial-gradient(1200px circle at 10% 10%, rgba(200, 169, 81, 0.08), transparent 55%),
+    radial-gradient(900px circle at 90% 20%, rgba(200, 169, 81, 0.04), transparent 60%),
+    linear-gradient(180deg, #0b0b0b 0%, #070707 100%);
+}
+
+.skeleton {
+  background: rgba(246, 246, 246, 0.08);
+  border-radius: 12px;
+  animation: shimmer 2.6s ease-in-out infinite;
+}
+
+.skeleton-soft {
+  background: rgba(246, 246, 246, 0.06);
+  border-radius: 999px;
+  animation: shimmer 2.6s ease-in-out infinite;
+}
+
+@media (pointer: fine) {
+  body.lux-cursor {
+    cursor: none;
+  }
+
+  body.lux-cursor a,
+  body.lux-cursor button {
+    cursor: none;
+  }
+}
+
+.scrollbar-lux::-webkit-scrollbar {
+  height: 6px;
+}
+
+.scrollbar-lux::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-lux::-webkit-scrollbar-thumb {
+  background: rgba(200, 169, 81, 0.35);
+  border-radius: 999px;
+}
+
+@keyframes shimmer {
+  0% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0.45;
+  }
+}
