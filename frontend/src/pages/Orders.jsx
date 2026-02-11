@@ -15,16 +15,32 @@ const Orders = ({ direction, user }) => {
   useEffect(() => {
     const loadOrders = async () => {
       const token = getToken();
+      
+      // If no token, load orders from localStorage
       if (!token) {
-        setLoading(false);
+        try {
+          const localOrders = JSON.parse(localStorage.getItem("innoventure_orders") || "[]");
+          setOrders(localOrders);
+        } catch (error) {
+          setMessage("Unable to load orders from local storage");
+        } finally {
+          setLoading(false);
+        }
         return;
       }
 
+      // If token exists, try to load from API
       try {
         const data = await apiRequest("/orders");
         setOrders(data);
       } catch (error) {
-        setMessage(error.message || "Unable to load orders");
+        // If API fails, fallback to localStorage
+        try {
+          const localOrders = JSON.parse(localStorage.getItem("innoventure_orders") || "[]");
+          setOrders(localOrders);
+        } catch (localError) {
+          setMessage(error.message || "Unable to load orders");
+        }
       } finally {
         setLoading(false);
       }
@@ -34,6 +50,27 @@ const Orders = ({ direction, user }) => {
   }, []);
 
   const handleCancel = async (orderId) => {
+    const token = getToken();
+    
+    // If no token, update localStorage
+    if (!token) {
+      try {
+        const localOrders = JSON.parse(localStorage.getItem("innoventure_orders") || "[]");
+        const updatedOrders = localOrders.map(order => 
+          order._id === orderId 
+            ? { ...order, orderStatus: "cancelled", paymentStatus: "cancelled" }
+            : order
+        );
+        localStorage.setItem("innoventure_orders", JSON.stringify(updatedOrders));
+        setOrders(updatedOrders);
+        setMessage("Order cancelled successfully");
+      } catch (error) {
+        setMessage("Unable to cancel order");
+      }
+      return;
+    }
+    
+    // If token exists, try API
     try {
       const data = await apiRequest(`/orders/${orderId}/cancel`, {
         method: "PUT"

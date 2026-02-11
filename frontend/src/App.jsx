@@ -315,6 +315,10 @@ const AppShell = () => {
     setCartItems([]);
   };
 
+  const clearCart = () => {
+    setCartItems([]);
+  };
+
   const handleAuth = (token, user) => {
     if (token) {
       setToken(token);
@@ -420,6 +424,7 @@ const AppShell = () => {
                 direction={direction}
                 items={cartItems}
                 user={authUser}
+                onClearCart={clearCart}
               />
             }
           />

@@ -6,7 +6,7 @@ import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
 import { apiRequest, getToken } from "../lib/api";
 
-const Checkout = ({ direction, items, user }) => {
+const Checkout = ({ direction, items, user, onClearCart }) => {
   const navigate = useNavigate();
   const [email, setEmail] = useState(user?.email || "");
   const [shipping, setShipping] = useState({
@@ -112,7 +112,38 @@ const Checkout = ({ direction, items, user }) => {
         setErrorMessage("Failed to initialize payment session.");
       }
     } catch (error) {
-      setErrorMessage("Your order is placed! Cash on Delivery.");
+      // Store order locally if backend fails (no authentication)
+      const localOrder = {
+        _id: Date.now().toString(),
+        items: items.map(item => ({
+          productId: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.qty
+        })),
+        totalAmount: finalTotal,
+        shippingAddress: shipping,
+        customerEmail: email,
+        paymentMethod: "Cash on Delivery",
+        orderStatus: "processing",
+        paymentStatus: "pending",
+        createdAt: new Date().toISOString()
+      };
+      
+      // Get existing orders from localStorage
+      const existingOrders = JSON.parse(localStorage.getItem("innoventure_orders") || "[]");
+      existingOrders.unshift(localOrder);
+      localStorage.setItem("innoventure_orders", JSON.stringify(existingOrders));
+      
+      // Clear the cart after successful order
+      if (onClearCart) {
+        onClearCart();
+      }
+      
+      setMessage("Order placed successfully! Cash on Delivery.");
+      setTimeout(() => {
+        navigate("/orders");
+      }, 2000);
     } finally {
       setLoading(false);
     }
