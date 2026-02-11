@@ -35,7 +35,7 @@ const productSchema = new mongoose.Schema({
   },
   occasion: {
     type: String,
-    enum: ['Daily', 'Evening', 'Luxury', 'Sport', 'Casual'],
+    enum: ['Daily', 'Evening', 'Luxury', 'Sport', 'Casual', 'Office', 'Party', 'Gifting'],
     required: true
   },
   performance: {

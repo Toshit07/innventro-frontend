@@ -32,16 +32,46 @@ router.get('/', authenticate, async (req, res) => {
   }
 });
 
+const ensureProduct = async (candidate = {}) => {
+  if (!candidate.id) return null;
+
+  const existing = await Product.findOne({ id: candidate.id });
+  if (existing) return existing._id;
+
+  const created = await Product.create({
+    id: candidate.id,
+    name: candidate.name,
+    brand: candidate.brand,
+    description: candidate.description,
+    short: candidate.short,
+    price: candidate.price,
+    family: candidate.family,
+    occasion: candidate.occasion,
+    performance: candidate.performance,
+    notes: candidate.notes,
+    images: candidate.images,
+    exclusive: candidate.exclusive,
+    stock: candidate.stock || 50
+  });
+
+  return created._id;
+};
+
 // Add to cart
 router.post('/add', authenticate, async (req, res) => {
   try {
-    const { productId, quantity = 1 } = req.body;
-    const resolvedId = await resolveProductId(productId);
+    const { productId, quantity = 1, product } = req.body;
+    let resolvedId = await resolveProductId(productId);
+
+    if (!resolvedId && product) {
+      resolvedId = await ensureProduct(product);
+    }
+
     if (!resolvedId) {
       return res.status(404).json({ message: 'Product not found' });
     }
 
-    const product = await Product.findById(resolvedId);
+    const productDoc = await Product.findById(resolvedId);
 
     let cart = await Cart.findOne({ userId: req.user.id });
     
@@ -59,7 +89,7 @@ router.post('/add', authenticate, async (req, res) => {
       cart.items.push({
         productId: resolvedId,
         quantity: Number(quantity),
-        price: product.price
+        price: productDoc?.price || product?.price || 0
       });
     }
 

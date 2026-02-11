@@ -27,6 +27,11 @@ const orderSchema = new mongoose.Schema({
     zipCode: String,
     country: String
   },
+  customerEmail: {
+    type: String,
+    lowercase: true,
+    trim: true
+  },
   totalAmount: {
     type: Number,
     required: true
@@ -42,7 +47,8 @@ const orderSchema = new mongoose.Schema({
   paymentMethod: {
     type: String,
     enum: ['stripe', 'paypal', 'card'],
-    required: true
+    required: true,
+    default: 'card'
   },
   paymentStatus: {
     type: String,

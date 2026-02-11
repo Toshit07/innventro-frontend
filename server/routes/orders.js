@@ -51,7 +51,12 @@ router.get('/:id', authenticate, async (req, res) => {
 // Create order from cart
 router.post('/', authenticate, async (req, res) => {
   try {
-    const { shippingAddress, paymentMethod, items: bodyItems } = req.body;
+    const {
+      shippingAddress,
+      paymentMethod,
+      customerEmail,
+      items: bodyItems
+    } = req.body;
 
     const cart = await Cart.findOne({ userId: req.user.id }).populate('items.productId');
 
@@ -90,7 +95,8 @@ router.post('/', authenticate, async (req, res) => {
       userId: req.user.id,
       items,
       shippingAddress,
-      paymentMethod,
+      paymentMethod: paymentMethod || 'card',
+      customerEmail,
       totalAmount,
       paymentStatus: 'pending'
     });

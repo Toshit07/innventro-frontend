@@ -1,5 +1,7 @@
 import jwt from 'jsonwebtoken';
 
+const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret';
+
 // Enhanced authentication middleware
 export const authenticate = (req, res, next) => {
   try {
@@ -12,7 +14,7 @@ export const authenticate = (req, res, next) => {
       });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET);
 
     // Ensure token is an access token
     if (decoded.type && decoded.type !== 'access') {
@@ -58,7 +60,7 @@ export const optionalAuth = (req, res, next) => {
 
   if (token) {
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const decoded = jwt.verify(token, JWT_SECRET);
       if (decoded.type === 'access' || !decoded.type) {
         req.user = decoded;
       }

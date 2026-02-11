@@ -4,17 +4,20 @@ import User from '../models/User.js';
 
 const router = express.Router();
 
+const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret';
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || JWT_SECRET;
+
 // Enhanced token generation with refresh token support
 const generateTokens = (id, role) => {
   const accessToken = jwt.sign(
     { id, role, type: 'access' },
-    process.env.JWT_SECRET,
+    JWT_SECRET,
     { expiresIn: process.env.JWT_EXPIRE || '1h' }
   );
 
   const refreshToken = jwt.sign(
     { id, role, type: 'refresh' },
-    process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET,
+    JWT_REFRESH_SECRET,
     { expiresIn: '7d' }
   );
 
@@ -146,20 +149,33 @@ router.post('/login', async (req, res) => {
 });
 
 // Verify Token
-router.post('/verify', (req, res) => {
+router.post('/verify', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) {
       return res.status(401).json({ message: 'No token provided', valid: false });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET);
     
     if (decoded.type !== 'access') {
       return res.status(401).json({ message: 'Invalid token type', valid: false });
     }
 
-    res.json({ valid: true, user: decoded });
+    const user = await User.findById(decoded.id).select('name email role');
+    if (!user) {
+      return res.status(401).json({ message: 'User not found', valid: false });
+    }
+
+    res.json({
+      valid: true,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }
+    });
   } catch (error) {
     res.status(401).json({ message: 'Invalid or expired token', valid: false });
   }
@@ -174,10 +190,7 @@ router.post('/refresh', (req, res) => {
       return res.status(401).json({ message: 'Refresh token required' });
     }
 
-    const decoded = jwt.verify(
-      refreshToken,
-      process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET
-    );
+    const decoded = jwt.verify(refreshToken, JWT_REFRESH_SECRET);
 
     if (decoded.type !== 'refresh') {
       return res.status(401).json({ message: 'Invalid refresh token' });
