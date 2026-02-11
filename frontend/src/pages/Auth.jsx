@@ -1,11 +1,11 @@
 ﻿import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import PageTransition from "../components/animations/PageTransition";
 import SectionTitle from "../components/ui/SectionTitle";
 import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
-import { apiRequest, setToken, setUser } from "../lib/api";
+import { apiRequest, setToken, setUser, checkBackendHealth, API_URL } from "../lib/api";
 
 const Auth = ({ direction, onAuth, user }) => {
   const [isRegister, setIsRegister] = useState(false);
@@ -19,6 +19,22 @@ const Auth = ({ direction, onAuth, user }) => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [errorKey, setErrorKey] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [backendConnected, setBackendConnected] = useState(true);
+
+  // Check backend connection on mount
+  useEffect(() => {
+    const checkConnection = async () => {
+      const isHealthy = await checkBackendHealth();
+      if (!isHealthy) {
+        setBackendConnected(false);
+        triggerError(`⚠️ Cannot connect to server at ${API_URL}`);
+      } else {
+        setBackendConnected(true);
+      }
+    };
+    checkConnection();
+  }, []);
 
   const triggerError = (message) => {
     setError(message);
@@ -32,6 +48,12 @@ const Auth = ({ direction, onAuth, user }) => {
       return;
     }
 
+    if (!backendConnected) {
+      triggerError(`Cannot connect to server. Backend URL: ${API_URL}`);
+      return;
+    }
+
+    setLoading(true);
     try {
       const data = await apiRequest("/auth/login", {
         method: "POST",
@@ -42,8 +64,11 @@ const Auth = ({ direction, onAuth, user }) => {
       if (onAuth) onAuth(data.accessToken, data.user);
       setSuccess("Welcome back.");
       setError("");
+      setLogin({ email: "", password: "" });
     } catch (err) {
       triggerError(err.message || "Unable to sign in");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -58,6 +83,17 @@ const Auth = ({ direction, onAuth, user }) => {
       return;
     }
 
+    if (register.password.length < 6) {
+      triggerError("Password must be at least 6 characters long.");
+      return;
+    }
+
+    if (!backendConnected) {
+      triggerError(`Cannot connect to server. Backend URL: ${API_URL}`);
+      return;
+    }
+
+    setLoading(true);
     try {
       const data = await apiRequest("/auth/register", {
         method: "POST",
@@ -68,8 +104,16 @@ const Auth = ({ direction, onAuth, user }) => {
       if (onAuth) onAuth(data.accessToken, data.user);
       setSuccess("Account created successfully.");
       setError("");
+      setRegister({
+        name: "",
+        email: "",
+        password: "",
+        confirmPassword: ""
+      });
     } catch (err) {
       triggerError(err.message || "Unable to register");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -126,8 +170,8 @@ const Auth = ({ direction, onAuth, user }) => {
                   >
                     Forgot password?
                   </NavLink>
-                  <Button className="mt-4 w-full" onClick={handleLogin}>
-                    Enter Atelier
+                  <Button className="mt-4 w-full" onClick={handleLogin} disabled={loading}>
+                    {loading ? "Signing in..." : "Enter Atelier"}
                   </Button>
                 </div>
                 <button
@@ -185,8 +229,8 @@ const Auth = ({ direction, onAuth, user }) => {
                       }))
                     }
                   />
-                  <Button className="mt-4 w-full" onClick={handleRegister}>
-                    Create Account
+                  <Button className="mt-4 w-full" onClick={handleRegister} disabled={loading}>
+                    {loading ? "Creating..." : "Create Account"}
                   </Button>
                 </div>
                 <button

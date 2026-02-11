@@ -1,5 +1,11 @@
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
+// Debug: Log API URL on load
+if (typeof window !== 'undefined') {
+  console.log('🔗 API URL:', API_URL);
+  console.log('🌍 Frontend URL:', window.location.origin);
+}
+
 const TOKEN_KEY = "innoventure_token";
 const USER_KEY = "innoventure_user";
 
@@ -42,21 +48,48 @@ export const apiRequest = async (path, options = {}) => {
     requestHeaders.Authorization = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_URL}${path}`, {
-    method,
-    headers: requestHeaders,
-    body: body ? JSON.stringify(body) : undefined,
-    credentials: 'include'
-  });
+  const fullUrl = `${API_URL}${path}`;
+  console.log(`📡 ${method} ${fullUrl}`);
 
-  const data = await safeJson(response);
+  try {
+    const response = await fetch(fullUrl, {
+      method,
+      headers: requestHeaders,
+      body: body ? JSON.stringify(body) : undefined,
+      credentials: 'include'
+    });
 
-  if (!response.ok) {
-    const message = data?.message || "Request failed";
-    throw new Error(message);
+    const data = await safeJson(response);
+
+    if (!response.ok) {
+      const message = data?.message || `Request failed: ${response.status} ${response.statusText}`;
+      console.error(`❌ ${method} ${path}:`, message);
+      throw new Error(message);
+    }
+
+    console.log(`✅ ${method} ${path}:`, data);
+    return data;
+  } catch (error) {
+    if (error instanceof TypeError) {
+      // Network error - backend unreachable
+      console.error(`🌐 Network Error - Cannot reach ${API_URL}`);
+      throw new Error(`Cannot connect to server. Check if backend is running at ${API_URL}`);
+    }
+    console.error(`❌ API Error:`, error.message);
+    throw error;
   }
+};
 
-  return data;
+// Health check function
+export const checkBackendHealth = async () => {
+  try {
+    const response = await fetch(`${API_URL.replace('/api', '')}/api/health`, {
+      method: 'GET'
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
 };
 
 export { API_URL };
