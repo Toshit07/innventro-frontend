@@ -99,21 +99,6 @@ const Admin = ({ direction, user }) => {
 
   const token = getToken();
 
-  if (!user && !loading && !token) {
-    return (
-      <PageTransition direction={direction} className="lux-gradient">
-        <div className="mx-auto flex w-full max-w-4xl flex-col gap-10 px-6 pb-24 pt-28">
-          <SectionTitle
-            eyebrow="Admin"
-            title="Sign in to access admin tools"
-            description="Manage products, orders, and performance insights."
-          />
-          <Button onClick={() => navigate("/auth")}>Go to login</Button>
-        </div>
-      </PageTransition>
-    );
-  }
-
   if (user && user.role !== "admin") {
     return (
       <PageTransition direction={direction} className="lux-gradient">

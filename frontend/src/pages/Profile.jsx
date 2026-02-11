@@ -88,21 +88,6 @@ const Profile = ({ direction, user }) => {
 
   const token = getToken();
 
-  if (!user && !loading && !token) {
-    return (
-      <PageTransition direction={direction} className="lux-gradient">
-        <div className="mx-auto flex w-full max-w-4xl flex-col gap-10 px-6 pb-24 pt-28">
-          <SectionTitle
-            eyebrow="Account"
-            title="Sign in to view your profile"
-            description="Access your saved details, shipping information, and password settings."
-          />
-          <Button onClick={() => navigate("/auth")}>Go to login</Button>
-        </div>
-      </PageTransition>
-    );
-  }
-
   return (
     <PageTransition direction={direction} className="lux-gradient">
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-12 px-6 pb-24 pt-28">

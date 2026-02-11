@@ -7,11 +7,9 @@ import Product from "./pages/Product";
 import SampleKit from "./pages/SampleKit";
 import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
-import Auth from "./pages/Auth";
 import Checkout from "./pages/Checkout";
 import Orders from "./pages/Orders";
 import Admin from "./pages/Admin";
-import ForgotPassword from "./pages/ForgotPassword";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import FAQ from "./pages/FAQ";
@@ -51,10 +49,6 @@ const Navigation = ({ cartCount, onCartOpen, cartRef, user, onLogout }) => {
 
   if (user?.role === "admin") {
     links.splice(4, 0, { path: "/admin", label: "Admin" });
-  }
-
-  if (!user) {
-    links.splice(4, 0, { path: "/auth", label: "Login" });
   }
 
   return (
@@ -414,20 +408,6 @@ const AppShell = () => {
             element={
               <Cart direction={direction} items={cartItems} onUpdate={updateCart} />
             }
-          />
-          <Route
-            path="/auth"
-            element={
-              <Auth
-                direction={direction}
-                onAuth={handleAuth}
-                user={authUser}
-              />
-            }
-          />
-          <Route
-            path="/forgot"
-            element={<ForgotPassword direction={direction} />}
           />
           <Route
             path="/profile"
